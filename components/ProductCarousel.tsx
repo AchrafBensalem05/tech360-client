@@ -1,18 +1,8 @@
 "use client";
-import { useState } from "react";
-import ProductCard from "./ProductCard";
+import { useState, useEffect } from "react";
+import ProductCard from "@/components/ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  oldPrice?: number;
-  bestseller?: boolean;
-  rating?: string;
-  reviews?: number;
-  image: string;
-}
+import { Product } from "@/types/product";
 
 interface ProductCarouselProps {
   products: Product[];
@@ -20,7 +10,26 @@ interface ProductCarouselProps {
 
 const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
   const [startIndex, setStartIndex] = useState(0);
-  const itemsPerPage = 4;
+  const [itemsPerPage, setItemsPerPage] = useState(4);
+
+  // ✅ Update items per page based on screen size
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      if (window.innerWidth < 640) {
+        setItemsPerPage(1); // Mobile: 1 items per page
+      } else if (window.innerWidth < 1024) {
+        setItemsPerPage(2); // Mobile: 2 items per page
+      } else if (window.innerWidth < 1044) {
+        setItemsPerPage(3); // Tablet: 3 items per page
+      } else {
+        setItemsPerPage(4); // Desktop: 4 items per page
+      }
+    };
+
+    updateItemsPerPage();
+    window.addEventListener("resize", updateItemsPerPage);
+    return () => window.removeEventListener("resize", updateItemsPerPage);
+  }, []);
 
   const handleNext = () => {
     if (startIndex + itemsPerPage < products.length) {
@@ -34,13 +43,12 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
     }
   };
 
-  // Get the visible products for the current page
   const visibleProducts = products.slice(startIndex, startIndex + itemsPerPage);
-  const emptySlots = itemsPerPage - visibleProducts.length; // Number of missing products
+  const emptySlots = itemsPerPage - visibleProducts.length;
 
   return (
     <div className="relative w-full max-w-screen-xl mx-auto p-6">
-      {/* Header with buttons aligned to the top right */}
+      {/* Header with navigation buttons */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">Shop our best sales</h2>
         <div className="flex gap-2">
@@ -61,18 +69,24 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ products }) => {
         </div>
       </div>
 
-      {/* Carousel Container (Fixed Width) */}
-      <div className="w-full overflow-hidden">
-        <div className="flex gap-4">
+      <div className="w-full overflow-x-clip py-4 sm:py-6 px-2 md:py-6 lg:px-4 xl:px-6">
+        <div className="flex gap-2 w-full">
           {/* Render products */}
           {visibleProducts.map((product) => (
-            <div key={product.id} className="w-1/4">
+            <div
+              key={product.id}
+              className="sm:w-full md:w-[50%] lg:w-[33.33%] xl:w-[25%] flex-shrink-0"
+            >
               <ProductCard product={product} />
             </div>
           ))}
-          {/* Placeholder items to maintain layout when fewer than 4 items */}
+
+          {/* Empty slots to maintain layout */}
           {Array.from({ length: emptySlots }).map((_, index) => (
-            <div key={`empty-${index}`} className="w-1/4 opacity-0"></div>
+            <div
+              key={`empty-${index}`}
+              className="sm:w-full md:w-[50%] lg:w-[33.33%] xl:w-[25%] flex-shrink-0 opacity-0"
+            ></div>
           ))}
         </div>
       </div>

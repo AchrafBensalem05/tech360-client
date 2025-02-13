@@ -59,7 +59,7 @@ export default function Navbar() {
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setHoveredCategory(null);
-    }, 1000); // 1 second delay
+    }, 700);
   };
   return (
     <nav className="bg-white shadow-md relative">

@@ -1,11 +1,11 @@
-import ProductCarousel from "@/app/components/ProductCarousel";
+import {ProductCarousel} from "@/components/ProductComponents";
 import { productData } from "@/data/ProductData";
 
 const CategoriesPage: React.FC = () => {
   return (
-    <div>
+    <>
       <ProductCarousel  products={productData} />
-    </div>
+    </>
   );
 };
 
